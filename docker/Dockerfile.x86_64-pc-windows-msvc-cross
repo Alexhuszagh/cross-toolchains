@@ -21,9 +21,9 @@ RUN /wine.sh
 COPY cross-toolchains/docker/perl.sh /
 RUN /perl.sh
 
-ARG ARCH=x64
+ENV MSVC_ARCH=x64
 COPY cross-toolchains/docker/msvc-wine-symlink.sh /
-RUN /msvc-wine-symlink.sh $ARCH
+RUN /msvc-wine-symlink.sh $MSVC_ARCH
 
 # run-detectors are responsible for calling the correct interpreter for exe
 # files. For some reason it does not work inside a docker container (it works
@@ -37,14 +37,12 @@ RUN mkdir -p /usr/lib/binfmt-support/ && \
     ln -s /usr/bin/wine /usr/bin/run-detectors
 
 COPY cross-toolchains/docker/msvc-windows-entry.sh /
+COPY cross-toolchains/docker/msvc-env.sh /
 ENTRYPOINT ["/msvc-windows-entry.sh"]
 
 ENV CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER=link.exe \
     CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUNNER=wine \
     CC_x86_64_pc_windows_msvc=cl.exe \
     CXX_x86_64_pc_windows_msvc=cl.exe \
-    PATH=/opt/msvc/bin/$ARCH:/opt/bin:$PATH \
-    WINEPATH="$WINEPATH;C:/windows/syswow64;C:/windows/system32;/opt/msvc/bin/$ARCH" \
-    VSINSTALLDIR="/opt/msvc" \
-    VCINSTALLDIR="/opt/msvc/vc" \
-    VSCMD_ARG_TGT_ARCH=$ARCH
+    PATH=/opt/msvc/bin/$MSVC_ARCH:/opt/bin:$PATH \
+    WINEPATH="$WINEPATH;C:/windows/syswow64;C:/windows/system32;/opt/msvc/bin/$MSVC_ARCH"

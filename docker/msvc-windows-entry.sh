@@ -11,4 +11,7 @@ mkdir -p "${WINEPREFIX}"
 # FIXME: Make the wine prefix initialization faster
 wineboot &> /dev/null
 
+# shellcheck disable=SC1091
+. msvc-env.sh
+
 exec "$@"
